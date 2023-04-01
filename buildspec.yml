@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+      - npm prune --production
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image
+      - docker build -t kxc-teste .
+      - $(aws ecr get-login --no-include-email --region $us-east-1)
+      - docker tag kxc-teste:v3 $803792208699.dkr.ecr.$us-east-1.amazonaws.com/kxc-teste:v3
+      - docker push $803792208699.dkr.ecr.$us-east-1.amazonaws.com/kxc-teste:v3
+artifacts:
+  files:
+    - '**/*'
+  name: kxc-teste
+  discard-paths: yes
+  type: zip
