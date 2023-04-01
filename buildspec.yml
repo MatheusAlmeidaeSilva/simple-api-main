@@ -2,20 +2,25 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      nodejs: 14-alpine
+  pre_build:
     commands:
-      - npm install
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --no-include-email --region $us-east-1)
   build:
     commands:
+      - echo Build started on `date`
+      - npm install
       - npm run build
-      - npm prune --production
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Pushing the Docker image
-      - docker build -t kxc-teste .
-      - $(aws ecr get-login --no-include-email --region $us-east-1)
-      - docker tag kxc-teste:v3 $803792208699.dkr.ecr.$us-east-1.amazonaws.com/kxc-teste:v3
-      - docker push $803792208699.dkr.ecr.$us-east-1.amazonaws.com/kxc-teste:v3
+      - docker build -t $803792208699.dkr.ecr.$us-east-1.amazonaws.com/$kxc-teste:$latest .
+      - docker push $803792208699.dkr.ecr.$us-east-1.amazonaws.com/$kxc-teste:$latest
+      - echo Deploying the latest version of the application...
+      - aws ecs update-service --cluster $kxc-teste-cluster --service $kxc-teste-service --force-new-deployment
 artifacts:
   files:
     - '**/*'
