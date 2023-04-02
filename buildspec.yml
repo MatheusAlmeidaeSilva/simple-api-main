@@ -18,10 +18,10 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - docker build -t $803792208699.dkr.ecr.$us-east-1.amazonaws.com/$kxc-teste:$latest .
-      - docker push $803792208699.dkr.ecr.$us-east-1.amazonaws.com/$kxc-teste:$latest
+      - docker build -t 803792208699.dkr.ecr.us-east-1.amazonaws.com/kxc-teste:latest .
+      - docker push 803792208699.dkr.ecr.us-east-1.amazonaws.com/kxc-teste:latest
       - echo Deploying the latest version of the application...
-      - aws ecs update-service --cluster $kxc-teste-cluster --service $kxc-teste-service --force-new-deployment
+      - aws ecs update-service --cluster kxc-teste-cluster --service kxc-teste-service --force-new-deployment
 artifacts:
   files:
     - '**/*'
