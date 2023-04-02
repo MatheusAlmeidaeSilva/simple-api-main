@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:16
 
 # Criando o diretório de trabalho
 WORKDIR /app
