@@ -1,4 +1,4 @@
-version: 0.2
+version: 0.3
 
 phases:
   install:
@@ -9,22 +9,23 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - $(aws ecr get-login --no-include-email --region us-east-1)
-      - REPOSITORY_URI=803792208699.dkr.ecr.us-east-1.amazonaws.com/kxc-teste
+      - $(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 803792208699.dkr.ecr.us-east-1.amazonaws.com)
+      - export REPOSITORY_URI=803792208699.dkr.ecr.us-east-1.amazonaws.com/kxc-teste
       - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   build:
     commands:
       - echo Build started on `date`
       - npm install
-      - docker build -t kxc-teste .
-      - docker tag kxc-teste:latest 803792208699.dkr.ecr.us-east-1.amazonaws.com/kxc-teste:latest .
+      - docker build -t $REPOSITORY_URI .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
-      - docker push 803792208699.dkr.ecr.us-east-1.amazonaws.com/kxc-teste:latest
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Deploying the latest version of the application...
       - aws ecs update-service --cluster kxc-teste-cluster --service kxc-teste-service --force-new-deployment
-      - printf '[{"name":"kxc-teste-container","imageUri":"%s"}]' $REPOSITORY_URI:IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"kxc-teste-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
   files:
     - 'imagedefinitions.json'
