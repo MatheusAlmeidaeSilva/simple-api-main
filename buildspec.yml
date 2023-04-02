@@ -8,7 +8,8 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - $aws ecr get-login --no-include-email --region $us-east-1
+      - $(aws ecr get-login --no-include-email --region $us-east-1)
+      - export latest=$(git describe --tags --always --dirty)
   build:
     commands:
       - echo Build started on `date`
