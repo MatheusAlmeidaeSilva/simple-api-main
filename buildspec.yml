@@ -24,7 +24,7 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Deploying the latest version of the application...
-      - aws ecs update-service --cluster kxc-teste-cluster --service kxc-teste-service --force-new-deployment
+      - aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment
       - printf '[{"name":"kxc-teste-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
   files:
